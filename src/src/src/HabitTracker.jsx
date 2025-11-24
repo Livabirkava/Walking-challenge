@@ -1,14 +1,167 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Users, Edit2 } from 'lucide-react';
 
+const ADMIN_CODE = 'startschool2024';
+const PHASE_DAYS = 15;
+
 // Helper: "Līva Birkava" -> "Līva B."
-const shortenName = (name) => {
+function shortenName(name) {
   const parts = name.trim().split(/\s+/);
   if (parts.length < 2) return name;
   const first = parts[0];
   const lastInitial = parts[parts.length - 1][0] || '';
   return `${first} ${lastInitial}.`;
-};
+}
+
+const RAW_TEAMS = [
+  {
+    id: 1,
+    name: 'Squad 1',
+    members: [
+      'Līva Birkava',
+      'Oskars Zvingulis',
+      'Helvijs Leja',
+      'Kerena Ansone',
+      'Valērija Ecina',
+      'Iveta Zālīte',
+      'Jānis Ārgalis',
+      'Raimonds Prieditis',
+    ],
+  },
+  {
+    id: 2,
+    name: 'Squad 2',
+    members: [
+      'Zlata Daškeviča',
+      'Inga Priedīte',
+      'Aksels Trulis',
+      'Rihards Liepa',
+      'Vita Jekabsone',
+      'Sandis Mežaraups',
+      'Emils Ronis',
+      'Zane Jakobsone',
+    ],
+  },
+  {
+    id: 3,
+    name: 'Squad 3',
+    members: [
+      'Liene Dobele',
+      'Krists Andersons',
+      'Alise Linda Valdheima',
+      'Gints Turlajs',
+      'Elizabete Akona',
+      'Jānis Trēgers',
+      'Edvards Broders',
+      'Robins Reins',
+      'Markuss Brieze',
+    ],
+  },
+  {
+    id: 4,
+    name: 'Squad 4',
+    members: [
+      'Anita',
+      'Andris',
+      'Viktors',
+      'Jahid',
+      'Aigars',
+      'Erik B.',
+      'Ēriks',
+      'Ralfs',
+      'Alla',
+    ],
+  },
+  {
+    id: 5,
+    name: 'Squad 5',
+    members: [
+      'Janis Vedla',
+      'Mikus Straumens',
+      'Laila Pastare',
+      'Linda Bondare',
+      'Arturs Dukalskis',
+      'Alberts Levics',
+      'Petra Baiba Olehno',
+      'Māris Punenovs',
+    ],
+  },
+  {
+    id: 6,
+    name: 'Squad 6',
+    members: [
+      'Alic Merlivat',
+      'Romans Kartasovs',
+      'Martins Mozga',
+      'Maris Nelsons',
+      'Matvei Medvedev',
+      'Adrians Piliksers',
+      'Juris Lebedoks',
+      'Dāvis Reinis',
+      'Karlis Kalds',
+    ],
+  },
+  {
+    id: 7,
+    name: 'Squad 7',
+    members: [
+      'Alyona Matvejeva',
+      'Jānis Strapcāns',
+      'Inese Tīkmane',
+      'Zanda Rasa',
+      'Inga Kononova',
+      'Inga Basikirska',
+      'Sandra Smalina',
+      'Guntars Nemiro',
+      'Destane Dagnija Sandberga',
+    ],
+  },
+  {
+    id: 8,
+    name: 'Squad 8',
+    members: [
+      'Jēkabs',
+      'Carloss',
+      'Marta',
+      'Victoria',
+      'Normunds',
+      'Kristīne',
+      'Markuss',
+      'Ivo',
+    ],
+  },
+  {
+    id: 9,
+    name: 'Squad 9',
+    members: [
+      'Jurita Brunava',
+      'Agnese Misāne',
+      'Nils Ozols',
+      'Aivis Brutans',
+      'Deniss Vigovskis',
+      'Artis Steinerts',
+      'Rolands Silins',
+    ],
+  },
+];
+
+const createEmptyHabits = () => ({
+  phase1: 0,
+  phase2: 0,
+  phase3: 0,
+});
+
+const createInitialTeams = () =>
+  RAW_TEAMS.map((team) => ({
+    ...team,
+    members: team.members.map((name, index) => ({
+      id: `${team.id}-${index}`,
+      name: shortenName(name),
+      habits: createEmptyHabits(),
+    })),
+  }));
+
+const getPhaseKey = (phase) => `phase${phase}`;
 
 export default function HabitTracker() {
   const [teams, setTeams] = useState([]);
@@ -24,7 +177,7 @@ export default function HabitTracker() {
   const handleAdminLogin = () => {
     const code = window.prompt('Enter admin code:');
     if (!code) return;
-    if (code === 'startschool2024') {
+    if (code === ADMIN_CODE) {
       setIsAdmin(true);
     } else {
       window.alert('Wrong code');
@@ -42,153 +195,7 @@ export default function HabitTracker() {
         console.error('Failed to load saved data:', e);
       }
     }
-
-    const initialTeams = [
-      {
-        id: 1,
-        name: 'Squad 1',
-        members: [
-          'Līva Birkava',
-          'Oskars Zvingulis',
-          'Helvijs Leja',
-          'Kerena Ansone',
-          'Valērija Ecina',
-          'Iveta Zālīte',
-          'Jānis Ārgalis',
-          'Raimonds Prieditis'
-        ]
-      },
-      {
-        id: 2,
-        name: 'Squad 2',
-        members: [
-          'Zlata Daškeviča',
-          'Inga Priedīte',
-          'Aksels Trulis',
-          'Rihards Liepa',
-          'Vita Jekabsone',
-          'Sandis Mežaraups',
-          'Emils Ronis',
-          'Zane Jakobsone'
-        ]
-      },
-      {
-        id: 3,
-        name: 'Squad 3',
-        members: [
-          'Liene Dobele',
-          'Krists Andersons',
-          'Alise Linda Valdheima',
-          'Gints Turlajs',
-          'Elizabete Akona',
-          'Jānis Trēgers',
-          'Edvards Broders',
-          'Robins Reins',
-          'Markuss Brieze'
-        ]
-      },
-      {
-        id: 4,
-        name: 'Squad 4',
-        members: [
-          'Anita',
-          'Andris',
-          'Viktors',
-          'Jahid',
-          'Aigars',
-          'Erik B.',
-          'Ēriks',
-          'Ralfs',
-          'Alla'
-        ]
-      },
-      {
-        id: 5,
-        name: 'Squad 5',
-        members: [
-          'Janis Vedla',
-          'Mikus Straumens',
-          'Laila Pastare',
-          'Linda Bondare',
-          'Arturs Dukalskis',
-          'Alberts Levics',
-          'Petra Baiba Olehno',
-          'Māris Punenovs'
-        ]
-      },
-      {
-        id: 6,
-        name: 'Squad 6',
-        members: [
-          'Alic Merlivat',
-          'Romans Kartasovs',
-          'Martins Mozga',
-          'Maris Nelsons',
-          'Matvei Medvedev',
-          'Adrians Piliksers',
-          'Juris Lebedoks',
-          'Dāvis Reinis',
-          'Karlis Kalds'
-        ]
-      },
-      {
-        id: 7,
-        name: 'Squad 7',
-        members: [
-          'Alyona Matvejeva',
-          'Jānis Strapcāns',
-          'Inese Tīkmane',
-          'Zanda Rasa',
-          'Inga Kononova',
-          'Inga Basikirska',
-          'Sandra Smalina',
-          'Guntars Nemiro',
-          'Destane Dagnija Sandberga'
-        ]
-      },
-      {
-        id: 8,
-        name: 'Squad 8',
-        members: [
-          'Jēkabs',
-          'Carloss',
-          'Marta',
-          'Victoria',
-          'Normunds',
-          'Kristīne',
-          'Markuss',
-          'Ivo'
-        ]
-      },
-      {
-        id: 9,
-        name: 'Squad 9',
-        members: [
-          'Jurita Brunava',
-          'Agnese Misāne',
-          'Nils Ozols',
-          'Aivis Brutans',
-          'Deniss Vigovskis',
-          'Artis Steinerts',
-          'Rolands Silins'
-        ]
-      }
-    ];
-
-    const teamsWithMembers = initialTeams.map((team) => ({
-      ...team,
-      members: team.members.map((name, index) => ({
-        id: `${team.id}-${index}`,
-        name: shortenName(name),
-        habits: {
-          phase1: 0,
-          phase2: 0,
-          phase3: 0
-        }
-      }))
-    }));
-
-    setTeams(teamsWithMembers);
+    setTeams(createInitialTeams());
   }, []);
 
   // Save to localStorage whenever teams change
@@ -200,45 +207,43 @@ export default function HabitTracker() {
 
   const addMember = (teamId) => {
     if (!isAdmin) return;
-    setTeams(
-      teams.map((team) => {
-        if (team.id === teamId && team.members.length < 9) {
-          return {
-            ...team,
-            members: [
-              ...team.members,
-              {
-                id: Date.now(),
-                name: `Dalībnieks ${team.members.length + 1}`,
-                habits: { phase1: 0, phase2: 0, phase3: 0 }
-              }
-            ]
-          };
-        }
-        return team;
-      })
+    setTeams((prev) =>
+      prev.map((team) =>
+        team.id === teamId && team.members.length < 9
+          ? {
+              ...team,
+              members: [
+                ...team.members,
+                {
+                  id: Date.now(),
+                  name: `Dalībnieks ${team.members.length + 1}`,
+                  habits: createEmptyHabits(),
+                },
+              ],
+            }
+          : team
+      )
     );
   };
 
   const removeMember = (teamId, memberId) => {
     if (!isAdmin) return;
-    setTeams(
-      teams.map((team) => {
-        if (team.id === teamId) {
-          return {
-            ...team,
-            members: team.members.filter((m) => m.id !== memberId)
-          };
-        }
-        return team;
-      })
+    setTeams((prev) =>
+      prev.map((team) =>
+        team.id === teamId
+          ? {
+              ...team,
+              members: team.members.filter((m) => m.id !== memberId),
+            }
+          : team
+      )
     );
   };
 
   const updateTeamName = (teamId, newName) => {
     if (!isAdmin) return;
-    setTeams(
-      teams.map((team) =>
+    setTeams((prev) =>
+      prev.map((team) =>
         team.id === teamId ? { ...team, name: newName } : team
       )
     );
@@ -247,53 +252,50 @@ export default function HabitTracker() {
 
   const updateMemberName = (teamId, memberId, newName) => {
     if (!isAdmin) return;
-    setTeams(
-      teams.map((team) => {
-        if (team.id === teamId) {
-          return {
-            ...team,
-            members: team.members.map((member) =>
-              member.id === memberId ? { ...member, name: newName } : member
-            )
-          };
-        }
-        return team;
-      })
+    setTeams((prev) =>
+      prev.map((team) =>
+        team.id === teamId
+          ? {
+              ...team,
+              members: team.members.map((member) =>
+                member.id === memberId ? { ...member, name: newName } : member
+              ),
+            }
+          : team
+      )
     );
     setEditingMember(null);
   };
 
   const updateMemberResult = (teamId, memberId, result) => {
     if (!isAdmin) return;
-    const phaseKey = `phase${currentPhase}`;
-    setTeams(
-      teams.map((team) => {
-        if (team.id === teamId) {
-          return {
-            ...team,
-            members: team.members.map((member) => {
-              if (member.id === memberId) {
-                return {
-                  ...member,
-                  habits: {
-                    ...member.habits,
-                    [phaseKey]: result
-                  }
-                };
-              }
-              return member;
-            })
-          };
-        }
-        return team;
-      })
+    const phaseKey = getPhaseKey(currentPhase);
+    setTeams((prev) =>
+      prev.map((team) =>
+        team.id === teamId
+          ? {
+              ...team,
+              members: team.members.map((member) =>
+                member.id === memberId
+                  ? {
+                      ...member,
+                      habits: {
+                        ...member.habits,
+                        [phaseKey]: result,
+                      },
+                    }
+                  : member
+              ),
+            }
+          : team
+      )
     );
   };
 
   const calculateStats = (team) => {
-    const phaseKey = `phase${currentPhase}`;
+    const phaseKey = getPhaseKey(currentPhase);
     let totalCompleted = 0;
-    const totalPossible = team.members.length * 15; // 3 weeks * 5 weekdays
+    const totalPossible = team.members.length * PHASE_DAYS;
 
     team.members.forEach((member) => {
       const result = parseInt(member.habits[phaseKey]) || 0;
@@ -306,7 +308,7 @@ export default function HabitTracker() {
       percentage:
         totalPossible > 0
           ? Math.round((totalCompleted / totalPossible) * 100)
-          : 0
+          : 0,
     };
   };
 
@@ -612,11 +614,11 @@ export default function HabitTracker() {
         {showTop3 && (
           <div className="space-y-6">
             {[1, 2, 3].map((phase) => {
-              const phaseKey = `phase${phase}`;
+              const phaseKey = getPhaseKey(phase);
               const rankedTeams = teams
                 .map((team) => {
                   let totalCompleted = 0;
-                  const totalPossible = team.members.length * 15;
+                  const totalPossible = team.members.length * PHASE_DAYS;
 
                   team.members.forEach((member) => {
                     const result = parseInt(member.habits[phaseKey]) || 0;
@@ -630,11 +632,9 @@ export default function HabitTracker() {
                       total: totalPossible,
                       percentage:
                         totalPossible > 0
-                          ? Math.round(
-                              (totalCompleted / totalPossible) * 100
-                            )
-                          : 0
-                    }
+                          ? Math.round((totalCompleted / totalPossible) * 100)
+                          : 0,
+                    },
                   };
                 })
                 .sort((a, b) => b.stats.percentage - a.stats.percentage)
@@ -790,7 +790,7 @@ export default function HabitTracker() {
           <div className="bg-white border border-gray-200 p-6">
             {(() => {
               const team = teams.find((t) => t.id === selectedTeam);
-              const phaseKey = `phase${currentPhase}`;
+              const phaseKey = getPhaseKey(currentPhase);
 
               if (!team) return null;
 
@@ -825,7 +825,7 @@ export default function HabitTracker() {
                             const result =
                               parseInt(member.habits[phaseKey]) || 0;
                             const percentage = Math.round(
-                              (result / 15) * 100
+                              (result / PHASE_DAYS) * 100
                             );
 
                             return (
@@ -880,13 +880,13 @@ export default function HabitTracker() {
                                     <input
                                       type="number"
                                       min="0"
-                                      max="15"
+                                      max={PHASE_DAYS}
                                       value={result}
                                       disabled={!isAdmin}
                                       onChange={(e) => {
                                         if (!isAdmin) return;
                                         const value = Math.min(
-                                          15,
+                                          PHASE_DAYS,
                                           Math.max(
                                             0,
                                             parseInt(e.target.value) || 0
@@ -904,12 +904,12 @@ export default function HabitTracker() {
                                       <div
                                         className="bg-blue-600 h-1 transition-all"
                                         style={{
-                                          width: `${percentage}%`
+                                          width: `${percentage}%`,
                                         }}
                                       />
                                     </div>
                                     <span className="text-sm text-gray-600 min-w-[4ch]">
-                                      / 15
+                                      / {PHASE_DAYS}
                                     </span>
                                   </div>
                                 </td>
@@ -930,7 +930,7 @@ export default function HabitTracker() {
         {!selectedTeam && !showIndividualRanking && !showTop3 && (
           <div className="space-y-6">
             {teams.map((team) => {
-              const phaseKey = `phase${currentPhase}`;
+              const phaseKey = getPhaseKey(currentPhase);
               return (
                 <div
                   key={team.id}
@@ -976,7 +976,7 @@ export default function HabitTracker() {
                               const result =
                                 parseInt(member.habits[phaseKey]) || 0;
                               const percentage = Math.round(
-                                (result / 15) * 100
+                                (result / PHASE_DAYS) * 100
                               );
 
                               return (
@@ -994,13 +994,13 @@ export default function HabitTracker() {
                                       <input
                                         type="number"
                                         min="0"
-                                        max="15"
+                                        max={PHASE_DAYS}
                                         value={result}
                                         disabled={!isAdmin}
                                         onChange={(e) => {
                                           if (!isAdmin) return;
                                           const value = Math.min(
-                                            15,
+                                            PHASE_DAYS,
                                             Math.max(
                                               0,
                                               parseInt(e.target.value) || 0
@@ -1018,12 +1018,12 @@ export default function HabitTracker() {
                                         <div
                                           className="bg-blue-600 h-1 transition-all"
                                           style={{
-                                            width: `${percentage}%`
+                                            width: `${percentage}%`,
                                           }}
                                         />
                                       </div>
                                       <span className="text-sm text-gray-600 min-w-[4ch]">
-                                        / 15
+                                        / {PHASE_DAYS}
                                       </span>
                                     </div>
                                   </td>
@@ -1095,12 +1095,9 @@ export default function HabitTracker() {
 
                     teams.forEach((team) => {
                       team.members.forEach((member) => {
-                        const phase1 =
-                          parseInt(member.habits.phase1) || 0;
-                        const phase2 =
-                          parseInt(member.habits.phase2) || 0;
-                        const phase3 =
-                          parseInt(member.habits.phase3) || 0;
+                        const phase1 = parseInt(member.habits.phase1) || 0;
+                        const phase2 = parseInt(member.habits.phase2) || 0;
+                        const phase3 = parseInt(member.habits.phase3) || 0;
                         const total = phase1 + phase2 + phase3;
 
                         allMembers.push({
@@ -1109,7 +1106,7 @@ export default function HabitTracker() {
                           phase1,
                           phase2,
                           phase3,
-                          total
+                          total,
                         });
                       });
                     });
