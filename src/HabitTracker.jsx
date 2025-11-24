@@ -280,18 +280,26 @@ export default function HabitTracker() {
   const phaseKey = `phase${currentPhase}`;
 
   // --- Data init ---
-  useEffect(() => {
-    const saved = localStorage.getItem('habitTrackerData');
-    if (saved) {
-      try {
-        setTeams(JSON.parse(saved));
+useEffect(() => {
+  const saved = localStorage.getItem('habitTrackerData');
+
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+
+      // ja ir normāls masīvs ar datiem – izmanto to
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        setTeams(parsed);
         return;
-      } catch (e) {
-        console.error('Failed to parse saved data', e);
       }
+    } catch (e) {
+      console.error('Failed to load saved data', e);
     }
-    setTeams(buildInitialTeams());
-  }, []);
+  }
+
+  // ja nav saglabātu datu – uzliek sākotnējos
+  setTeams(buildInitialTeams());
+}, []);
 
   // Save to localStorage
   useEffect(() => {
