@@ -1,9 +1,7 @@
-import HabitTracker from './HabitTracker';
-
 export default function App() {
   return (
-    <div className="min-h-screen bg-gray-100">
-      <HabitTracker />
+    <div style={{ padding: "40px", fontSize: "24px" }}>
+      ✅ Walking Challenge app is working!
     </div>
   );
 }
