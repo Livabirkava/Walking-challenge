@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Calendar,
-  Users,
-  Edit2,
-  X,
-} from 'lucide-react';
+import { Calendar, Users, Edit2, X } from 'lucide-react';
 
 // Helper: "Līva Birkava" -> "Līva B."
 const shortenName = (name) => {
@@ -302,16 +297,12 @@ export default function HabitTracker() {
             {/* October / Phase 1 */}
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <h3 className="text-lg font-semibold text-rose-500">
-                  October
-                </h3>
+                <h3 className="text-lg font-semibold text-rose-500">October</h3>
                 <span className="px-2 py-1 rounded text-xs font-medium bg-sky-100 text-sky-900">
                   Phase 1
                 </span>
               </div>
-              <div className="text-xs text-slate-500 mb-2">
-                Oct 21 – Nov 7
-              </div>
+              <div className="text-xs text-slate-500 mb-2">Oct 21 – Nov 7</div>
 
               <div className="grid grid-cols-7 gap-1 text-center text-xs">
                 {/* Weekday labels */}
@@ -363,13 +354,11 @@ export default function HabitTracker() {
                 <div className="py-1 rounded bg-sky-200 text-sky-900 font-medium">
                   25
                 </div>
-                <div className="py-1 rounded bg-sky-200 text-sky-900 font-medium">
-                  26
-                </div>
+                {/* 26 is Saturday – no color */}
+                <div className="py-1">26</div>
 
-                <div className="py-1 rounded bg-sky-200 text-sky-900 font-medium">
-                  27
-                </div>
+                {/* 27 is Sunday – no color */}
+                <div className="py-1">27</div>
                 <div className="py-1 rounded bg-sky-200 text-sky-900 font-medium">
                   28
                 </div>
@@ -387,19 +376,15 @@ export default function HabitTracker() {
               </div>
             </div>
 
-            {/* November / Phase 2 (with Phase 1 tail on 1–7) */}
+            {/* November / Phase 2 (with Phase 1 tail on 1–7, weekdays only) */}
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <h3 className="text-lg font-semibold text-rose-500">
-                  November
-                </h3>
+                <h3 className="text-lg font-semibold text-rose-500">November</h3>
                 <span className="px-2 py-1 rounded text-xs font-medium bg-sky-200 text-sky-900">
                   Phase 2
                 </span>
               </div>
-              <div className="text-xs text-slate-500 mb-2">
-                Nov 10 – Nov 28
-              </div>
+              <div className="text-xs text-slate-500 mb-2">Nov 10 – Nov 28</div>
 
               <div className="grid grid-cols-7 gap-1 text-center text-xs">
                 {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d) => (
@@ -414,17 +399,14 @@ export default function HabitTracker() {
                 <div className="text-slate-300">29</div>
                 <div className="text-slate-300">30</div>
                 <div className="text-slate-300">31</div>
+                {/* 1 = Friday (colored), 2 = Saturday (plain) */}
                 <div className="py-1 rounded bg-sky-200 text-sky-900 font-medium">
                   1
                 </div>
-                <div className="py-1 rounded bg-sky-200 text-sky-900 font-medium">
-                  2
-                </div>
+                <div className="py-1">2</div>
 
-                {/* Phase 1 tail in November (3–7) */}
-                <div className="py-1 rounded bg-sky-200 text-sky-900 font-medium">
-                  3
-                </div>
+                {/* 3 Sunday (plain), 4–7 Phase1 weekdays */}
+                <div className="py-1">3</div>
                 <div className="py-1 rounded bg-sky-200 text-sky-900 font-medium">
                   4
                 </div>
@@ -440,42 +422,58 @@ export default function HabitTracker() {
                 <div className="py-1">8</div>
                 <div className="py-1">9</div>
 
-                {/* Phase 2 (10–28) */}
-                {[10, 11, 12, 13, 14].map((d) => (
-                  <div
-                    key={d}
-                    className="py-1 rounded bg-sky-400 text-white font-medium"
-                  >
-                    {d}
-                  </div>
-                ))}
+                {/* Phase 2 (10–28) – weekdays only */}
+                <div className="py-1">10</div>
+                <div className="py-1 rounded bg-sky-400 text-white font-medium">
+                  11
+                </div>
+                <div className="py-1 rounded bg-sky-400 text-white font-medium">
+                  12
+                </div>
+                <div className="py-1 rounded bg-sky-400 text-white font-medium">
+                  13
+                </div>
+                <div className="py-1 rounded bg-sky-400 text-white font-medium">
+                  14
+                </div>
                 <div className="py-1">15</div>
+                <div className="py-1">16</div>
 
-                {[17, 18, 19, 20, 21].map((d) => (
-                  <div
-                    key={d}
-                    className="py-1 rounded bg-sky-400 text-white font-medium"
-                  >
-                    {d}
-                  </div>
-                ))}
+                <div className="py-1">17</div>
+                <div className="py-1 rounded bg-sky-400 text-white font-medium">
+                  18
+                </div>
+                <div className="py-1 rounded bg-sky-400 text-white font-medium">
+                  19
+                </div>
+                <div className="py-1 rounded bg-sky-400 text-white font-medium">
+                  20
+                </div>
+                <div className="py-1 rounded bg-sky-400 text-white font-medium">
+                  21
+                </div>
                 <div className="py-1">22</div>
                 <div className="py-1">23</div>
 
-                {[24, 25, 26, 27, 28].map((d) => (
-                  <div
-                    key={d}
-                    className="py-1 rounded bg-sky-400 text-white font-medium"
-                  >
-                    {d}
-                  </div>
-                ))}
+                <div className="py-1">24</div>
+                <div className="py-1 rounded bg-sky-400 text-white font-medium">
+                  25
+                </div>
+                <div className="py-1 rounded bg-sky-400 text-white font-medium">
+                  26
+                </div>
+                <div className="py-1 rounded bg-sky-400 text-white font-medium">
+                  27
+                </div>
+                <div className="py-1 rounded bg-sky-400 text-white font-medium">
+                  28
+                </div>
                 <div className="py-1">29</div>
                 <div className="py-1">30</div>
               </div>
             </div>
 
-            {/* December / Phase 3 */}
+            {/* December / Phase 3 – weekdays only */}
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <h3 className="text-lg font-semibold text-rose-500">
@@ -485,9 +483,7 @@ export default function HabitTracker() {
                   Phase 3
                 </span>
               </div>
-              <div className="text-xs text-slate-500 mb-2">
-                Dec 1 – Dec 19
-              </div>
+              <div className="text-xs text-slate-500 mb-2">Dec 1 – Dec 19</div>
 
               <div className="grid grid-cols-7 gap-1 text-center text-xs">
                 {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d) => (
@@ -496,31 +492,59 @@ export default function HabitTracker() {
                   </div>
                 ))}
 
-                {/* Phase 3 */}
-                {[1, 2, 3, 4, 5, 6, 7].map((d) => (
-                  <div
-                    key={d}
-                    className="py-1 rounded bg-indigo-400 text-white font-medium"
-                  >
-                    {d}
-                  </div>
-                ))}
-                {[8, 9, 10, 11, 12, 13, 14].map((d) => (
-                  <div
-                    key={d}
-                    className="py-1 rounded bg-indigo-400 text-white font-medium"
-                  >
-                    {d}
-                  </div>
-                ))}
-                {[15, 16, 17, 18, 19].map((d) => (
-                  <div
-                    key={d}
-                    className="py-1 rounded bg-indigo-400 text-white font-medium"
-                  >
-                    {d}
-                  </div>
-                ))}
+                {/* 1 Sunday (plain), 2–6 weekdays colored, 7 Saturday plain */}
+                <div className="py-1">1</div>
+                <div className="py-1 rounded bg-indigo-400 text-white font-medium">
+                  2
+                </div>
+                <div className="py-1 rounded bg-indigo-400 text-white font-medium">
+                  3
+                </div>
+                <div className="py-1 rounded bg-indigo-400 text-white font-medium">
+                  4
+                </div>
+                <div className="py-1 rounded bg-indigo-400 text-white font-medium">
+                  5
+                </div>
+                <div className="py-1 rounded bg-indigo-400 text-white font-medium">
+                  6
+                </div>
+                <div className="py-1">7</div>
+
+                {/* 8 Sunday plain, 9–13 colored, 14 Saturday plain */}
+                <div className="py-1">8</div>
+                <div className="py-1 rounded bg-indigo-400 text-white font-medium">
+                  9
+                </div>
+                <div className="py-1 rounded bg-indigo-400 text-white font-medium">
+                  10
+                </div>
+                <div className="py-1 rounded bg-indigo-400 text-white font-medium">
+                  11
+                </div>
+                <div className="py-1 rounded bg-indigo-400 text-white font-medium">
+                  12
+                </div>
+                <div className="py-1 rounded bg-indigo-400 text-white font-medium">
+                  13
+                </div>
+                <div className="py-1">14</div>
+
+                {/* 15 Sunday plain, 16–19 colored */}
+                <div className="py-1">15</div>
+                <div className="py-1 rounded bg-indigo-400 text-white font-medium">
+                  16
+                </div>
+                <div className="py-1 rounded bg-indigo-400 text-white font-medium">
+                  17
+                </div>
+                <div className="py-1 rounded bg-indigo-400 text-white font-medium">
+                  18
+                </div>
+                <div className="py-1 rounded bg-indigo-400 text-white font-medium">
+                  19
+                </div>
+
                 {[20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31].map((d) => (
                   <div key={d} className="py-1">
                     {d}
@@ -551,77 +575,72 @@ export default function HabitTracker() {
           </div>
         </div>
 
-        {/* HEADER + CONTROLS */}
+        {/* HEADER + CONTROLS (title removed, buttons left, admin right) */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 text-slate-600 mb-1">
+          <div className="flex flex-col md:flex-row md:items-center gap-3">
+            <div className="flex items-center gap-2 text-slate-600">
               <Calendar className="w-4 h-4" />
               <span className="text-sm">{currentPhase}. posms</span>
             </div>
-            <h1 className="text-2xl font-light tracking-wide text-slate-900">
-              Habit Tracker
-            </h1>
-          </div>
 
-          <div className="flex flex-wrap gap-2 items-center">
-            {[1, 2, 3].map((phase) => (
+            <div className="flex flex-wrap gap-2 items-center mt-2 md:mt-0">
+              {[1, 2, 3].map((phase) => (
+                <button
+                  key={phase}
+                  onClick={() => {
+                    setCurrentPhase(phase);
+                    setShowTop3(false);
+                    setShowIndividualRanking(false);
+                    setSelectedTeam(null);
+                  }}
+                  className={`px-4 py-2 text-sm font-medium border transition ${
+                    currentPhase === phase && !showTop3 && !showIndividualRanking
+                      ? 'bg-sky-600 text-white border-sky-600'
+                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  Phase {phase}
+                </button>
+              ))}
               <button
-                key={phase}
                 onClick={() => {
-                  setCurrentPhase(phase);
-                  setShowTop3(false);
+                  setShowTop3(true);
                   setShowIndividualRanking(false);
                   setSelectedTeam(null);
                 }}
                 className={`px-4 py-2 text-sm font-medium border transition ${
-                  currentPhase === phase &&
-                  !showTop3 &&
-                  !showIndividualRanking
+                  showTop3
+                    ? 'bg-slate-900 text-white border-slate-900'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                TOP 3
+              </button>
+              <button
+                onClick={() => {
+                  setShowIndividualRanking(true);
+                  setShowTop3(false);
+                  setSelectedTeam(null);
+                }}
+                className={`px-4 py-2 text-sm font-medium border transition ${
+                  showIndividualRanking
                     ? 'bg-sky-600 text-white border-sky-600'
                     : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                 }`}
               >
-                Phase {phase}
+                Individual Ranking
               </button>
-            ))}
-            <button
-              onClick={() => {
-                setShowTop3(true);
-                setShowIndividualRanking(false);
-                setSelectedTeam(null);
-              }}
-              className={`px-4 py-2 text-sm font-medium border transition ${
-                showTop3
-                  ? 'bg-slate-900 text-white border-slate-900'
-                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
-              }`}
-            >
-              TOP 3
-            </button>
-            <button
-              onClick={() => {
-                setShowIndividualRanking(true);
-                setShowTop3(false);
-                setSelectedTeam(null);
-              }}
-              className={`px-4 py-2 text-sm font-medium border transition ${
-                showIndividualRanking
-                  ? 'bg-sky-600 text-white border-sky-600'
-                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
-              }`}
-            >
-              Individual Ranking
-            </button>
-
-            {/* Subtle admin button */}
-            <button
-              type="button"
-              onClick={() => setShowAdminModal(true)}
-              className="ml-2 px-3 py-2 text-xs font-medium border border-slate-200 bg-white text-slate-500 hover:text-slate-800 hover:bg-slate-50"
-            >
-              Admin
-            </button>
+            </div>
           </div>
+
+          {/* Admin button on the right */}
+          <button
+            type="button"
+            onClick={() => setShowAdminModal(true)}
+            className="self-start md:self-auto px-3 py-2 text-xs font-medium border border-slate-200 bg-white text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+          >
+            Admin
+          </button>
         </div>
 
         {/* TOP 3 VIEW */}
@@ -630,10 +649,7 @@ export default function HabitTracker() {
             {[1, 2, 3].map((phase) => {
               const ranked = getTop3ByPhase(phase);
               return (
-                <div
-                  key={phase}
-                  className="bg-white border border-slate-200 p-6"
-                >
+                <div key={phase} className="bg-white border border-slate-200 p-6">
                   <h2 className="text-sm uppercase tracking-wider text-slate-500 mb-4">
                     Top 3 – Phase {phase}
                   </h2>
@@ -677,9 +693,7 @@ export default function HabitTracker() {
                 <button
                   key={team.id}
                   onClick={() =>
-                    setSelectedTeam(
-                      selectedTeam === team.id ? null : team.id
-                    )
+                    setSelectedTeam(selectedTeam === team.id ? null : team.id)
                   }
                   className={`bg-white border p-4 text-left transition ${
                     selectedTeam === team.id
@@ -688,9 +702,7 @@ export default function HabitTracker() {
                   }`}
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-medium text-slate-900">
-                      {team.name}
-                    </h3>
+                    <h3 className="font-medium text-slate-900">{team.name}</h3>
                     <span className="text-xs text-slate-500">
                       {team.members.length}/9
                     </span>
@@ -749,9 +761,7 @@ export default function HabitTracker() {
                           {team.members.map((member) => {
                             const result =
                               parseInt(member.habits[phaseKey]) || 0;
-                            const percentage = Math.round(
-                              (result / 15) * 100
-                            );
+                            const percentage = Math.round((result / 15) * 100);
                             return (
                               <tr
                                 key={member.id}
@@ -814,10 +824,7 @@ export default function HabitTracker() {
           <div className="space-y-6">
             {teams.map((team) => {
               return (
-                <div
-                  key={team.id}
-                  className="bg-white border border-slate-200"
-                >
+                <div key={team.id} className="bg-white border border-slate-200">
                   <div className="px-6 py-4 border-b border-slate-200">
                     <h3 className="text-base font-medium text-slate-900">
                       {team.name}
@@ -825,9 +832,7 @@ export default function HabitTracker() {
                   </div>
                   <div className="p-6">
                     {team.members.length === 0 ? (
-                      <p className="text-sm text-slate-400">
-                        Nav dalībnieku
-                      </p>
+                      <p className="text-sm text-slate-400">Nav dalībnieku</p>
                     ) : (
                       <div className="overflow-x-auto">
                         <table className="w-full text-sm">
@@ -844,12 +849,8 @@ export default function HabitTracker() {
                           <tbody>
                             {team.members.map((member) => {
                               const result =
-                                parseInt(
-                                  member.habits[phaseKey]
-                                ) || 0;
-                              const percentage = Math.round(
-                                (result / 15) * 100
-                              );
+                                parseInt(member.habits[phaseKey]) || 0;
+                              const percentage = Math.round((result / 15) * 100);
                               return (
                                 <tr
                                   key={member.id}
@@ -872,10 +873,7 @@ export default function HabitTracker() {
                                           updateMemberResult(
                                             team.id,
                                             member.id,
-                                            parseInt(
-                                              e.target.value,
-                                              10
-                                            )
+                                            parseInt(e.target.value, 10)
                                           )
                                         }
                                         className={`w-16 text-center bg-transparent outline-none border-0 text-slate-900 text-sm ${
@@ -911,7 +909,7 @@ export default function HabitTracker() {
           </div>
         )}
 
-        {/* INDIVIDUAL RANKING VIEW (with Squad column) */}
+        {/* INDIVIDUAL RANKING VIEW (with Squad column shortened to S1, S2, ...) */}
         {showIndividualRanking && (
           <div className="bg-white border border-slate-200 p-6 md:p-8">
             <h2 className="text-lg font-medium text-slate-900 mb-6">
@@ -972,7 +970,7 @@ export default function HabitTracker() {
                       </td>
                       <td className="py-3 px-4 text-center">
                         <span className="text-xs font-medium text-slate-600">
-                          {member.teamName}
+                          {member.teamName.replace('Squad ', 'S')}
                         </span>
                       </td>
                       <td className="py-3 px-4 text-center">
@@ -1014,8 +1012,8 @@ export default function HabitTracker() {
                 </button>
               </div>
               <p className="text-xs text-slate-500">
-                Enter admin code to enable editing. Without admin mode,
-                fields are view-only.
+                Enter admin code to enable editing. Without admin mode, fields
+                are view-only.
               </p>
               <form onSubmit={handleAdminSubmit} className="space-y-3">
                 <input
