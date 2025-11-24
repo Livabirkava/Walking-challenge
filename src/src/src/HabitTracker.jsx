@@ -911,86 +911,97 @@ export default function HabitTracker() {
           </div>
         )}
 
-        {/* Individual ranking view */}
-        {showIndividualRanking && (
-          <div className="bg-white border border-gray-200 p-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-6">
-              Individual Ranking - All Phases
-            </h2>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-4 text-xs uppercase tracking-wider text-gray-500 font-medium w-16">
-                      Place
-                    </th>
-                    <th className="text-left py-3 px-4 text-xs uppercase tracking-wider text-gray-500 font-medium">
-                      Participant
-                    </th>
-                    <th className="text-center py-3 px-4 text-xs uppercase tracking-wider text-gray-500 font-medium">
-                      Phase 1
-                    </th>
-                    <th className="text-center py-3 px-4 text-xs uppercase tracking-wider text-gray-500 font-medium">
-                      Phase 2
-                    </th>
-                    <th className="text-center py-3 px-4 text-xs uppercase tracking-wider text-gray-500 font-medium">
-                      Phase 3
-                    </th>
-                    <th className="text-center py-3 px-4 text-xs uppercase tracking-wider text-gray-900 font-semibold bg-gray-50">
-                      Total
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
+                      <tbody>
                   {(() => {
                     const allMembers = [];
+
                     teams.forEach(team => {
                       team.members.forEach(member => {
                         const phase1 = parseInt(member.habits.phase1) || 0;
                         const phase2 = parseInt(member.habits.phase2) || 0;
                         const phase3 = parseInt(member.habits.phase3) || 0;
                         const total = phase1 + phase2 + phase3;
-                        
+
                         allMembers.push({
                           ...member,
                           teamName: team.name,
                           phase1,
                           phase2,
                           phase3,
-                          total
+                          total,
                         });
                       });
                     });
-                    
-                    return allMembers.sort((a, b) => b.total - a.total).map((member, index) => (
-                      <tr key={member.id} className="border-b border-gray-100 hover:bg-gray-50">
-                        <td className="py-3 px-4">
-                          <span className={`text-sm font-medium ${
-                            index === 0 ? 'text-yellow-600' :
-                            index === 1 ? 'text-gray-500' :
-                            index === 2 ? 'text-orange-600' :
-                            'text-gray-400'
-                          }`}>
-                            #{index + 1}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4">
-                          <span className="text-sm text-gray-900">{member.name}</span>
-                        </td>
-                        <td className="py-3 px-4 text-center">
-                          <span className="text-sm text-gray-900">{member.phase1}/15</span>
-                        </td>
-                        <td className="py-3 px-4 text-center">
-                          <span className="text-sm text-gray-900">{member.phase2}/15</span>
-                        </td>
-                        <td className="py-3 px-4 text-center">
-                          <span className="text-sm text-gray-900">{member.phase3}/15</span>
-                        </td>
-                        <td className="py-3 px-4 text-center bg-gray-50">
-                          <span className="text-sm font-semibold text-gray-900">{member.total}/45</span>
-                        </td>
-                      </tr>
-                    ));
+
+                    return allMembers
+                      .sort((a, b) => b.total - a.total)
+                      .map((member, index) => {
+                        const squadShort =
+                          member.teamName &&
+                          member.teamName.startsWith('Squad ')
+                            ? 'S' + member.teamName.replace('Squad ', '')
+                            : member.teamName || '';
+
+                        return (
+                          <tr
+                            key={member.id}
+                            className="border-b border-gray-100 hover:bg-gray-50"
+                          >
+                            {/* place */}
+                            <td className="py-3 px-4">
+                              <span
+                                className={`text-sm font-medium ${
+                                  index === 0
+                                    ? 'text-yellow-600'
+                                    : index === 1
+                                    ? 'text-gray-500'
+                                    : index === 2
+                                    ? 'text-orange-600'
+                                    : 'text-gray-400'
+                                }`}
+                              >
+                                #{index + 1}
+                              </span>
+                            </td>
+
+                            {/* name */}
+                            <td className="py-3 px-4">
+                              <span className="text-sm text-gray-900">
+                                {member.name}
+                              </span>
+                            </td>
+
+                            {/* Squad */}
+                            <td className="py-3 px-4">
+                              <span className="text-sm text-gray-500">
+                                {squadShort}
+                              </span>
+                            </td>
+
+                            {/* phases + total */}
+                            <td className="py-3 px-4 text-center">
+                              <span className="text-sm text-gray-900">
+                                {member.phase1}/15
+                              </span>
+                            </td>
+                            <td className="py-3 px-4 text-center">
+                              <span className="text-sm text-gray-900">
+                                {member.phase2}/15
+                              </span>
+                            </td>
+                            <td className="py-3 px-4 text-center">
+                              <span className="text-sm text-gray-900">
+                                {member.phase3}/15
+                              </span>
+                            </td>
+                            <td className="py-3 px-4 text-center bg-gray-50">
+                              <span className="text-sm font-semibold text-gray-900">
+                                {member.total}/45
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      });
                   })()}
                 </tbody>
               </table>
