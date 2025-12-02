@@ -280,33 +280,50 @@ export default function HabitTracker() {
   const phaseKey = `phase${currentPhase}`;
 
   // --- Data init ---
-useEffect(() => {
-  const saved = localStorage.getItem('habitTrackerData');
-
-  if (saved) {
-    try {
-      const parsed = JSON.parse(saved);
-
-      // ja ir normāls masīvs ar datiem – izmanto to
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        setTeams(parsed);
-        return;
-      }
-    } catch (e) {
-      console.error('Failed to load saved data', e);
-    }
-  }
-
-  // ja nav saglabātu datu – uzliek sākotnējos
-  setTeams(buildInitialTeams());
-}, []);
-
-  // Save to localStorage
   useEffect(() => {
-    if (teams.length) {
-      localStorage.setItem('habitTrackerData', JSON.stringify(teams));
+    async function loadTeams() {
+      try {
+        // 1) mēģinām ielādēt no API
+        const res = await fetch('/api/teams');
+        if (res.ok) {
+          const data = await res.json();
+
+          if (Array.isArray(data.teams) && data.teams.length > 0) {
+            setTeams(data.teams);
+            return; // jau ir dati no servera
+          }
+        }
+      } catch (e) {
+        console.error('Failed to load from API, using defaults:', e);
+      }
+
+      // 2) ja nav datu no API – uzliek sākotnējās komandas
+      setTeams(buildInitialTeams());
     }
+
+    loadTeams();
+  }, []);
+
+
+  // Save to API (kopīgs visiem)
+  useEffect(() => {
+    if (!teams.length) return;
+
+    async function saveTeams() {
+      try {
+        await fetch('/api/teams', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ teams }),
+        });
+      } catch (e) {
+        console.error('Failed to save teams to API:', e);
+      }
+    }
+
+    saveTeams();
   }, [teams]);
+
 
   // --- Admin handling ---
   const handleAdminSubmit = (e) => {

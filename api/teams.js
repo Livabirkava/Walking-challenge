@@ -1,10 +1,7 @@
-
-// api/teams.js
 let savedTeams = [];
 
 export default function handler(req, res) {
   if (req.method === 'GET') {
-    // Atgriežam pēdējo saglabāto state
     return res.status(200).json({ teams: savedTeams });
   }
 
