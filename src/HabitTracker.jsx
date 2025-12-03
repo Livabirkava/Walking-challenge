@@ -2,11 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, Users, X } from 'lucide-react';
 
 // ----- CONSTANTS -------------------------------------------------------------
-const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxhceQX2zuvDbYNwVIV-86NhvRwNjEDrpfzez.../exec";
+
+// 👇 ŠEIT IELIEC SAVU PILNO /exec URL (bez "...")
+const SHEET_API_URL =
+  'https://script.google.com/macros/s/AKfycbysVXadEnycsjH6WWwBwrGSVKiskfbslvi4Kc-TWjTWeH93aktcI0TkYG6Zswx-5Jdu/exec';
 
 const ADMIN_CODE = 'walkingadmin';
 
-// Raw team data (names only)
+// Raw team data (names only) – fallback, ja API nestrādā
 const INITIAL_TEAMS = [
   {
     id: 1,
@@ -165,7 +168,7 @@ const calculateStats = (team, phaseKey) => {
   };
 };
 
-// Reusable member table (used in selected team view + all teams view)
+// Reusable member table
 const MemberTable = ({ team, phaseKey, isAdmin, onChange }) => {
   if (!team || !team.members.length) {
     return (
@@ -197,10 +200,7 @@ const MemberTable = ({ team, phaseKey, isAdmin, onChange }) => {
             const percentage = Math.round((result / 15) * 100);
 
             return (
-              <tr
-                key={member.id}
-                className="border-b border-slate-100 hover:bg-slate-50"
-              >
+              <tr key={member.id} className="border-b border-slate-100 hover:bg-slate-50">
                 <td className="py-3 px-4">
                   <span className="text-slate-900">{shortenName(member.name)}</span>
                 </td>
@@ -265,6 +265,39 @@ const WeekdayHeaderRow = () => (
   </>
 );
 
+// Transformē Google Sheets rindas uz teams struktūru
+// Piezīme: PĀRLIECINIES, ka šeit lietotie key nosaukumi atbilst pirmajai rindai tavā sheet:
+// piem. "Squad", "Name", "1", "2", "3" u.c.
+const transformSheetRows = (rows) => {
+  const groups = {};
+
+  rows.forEach((row, index) => {
+    const squad =
+      row.Squad || row.squad || row.squad_name || row['Squad name'] || row['squad_id'];
+    const name = row.Name || row.name || row.member_name;
+
+    if (!squad || !name) return;
+
+    if (!groups[squad]) groups[squad] = [];
+
+    groups[squad].push({
+      id: `${squad}-${index}`,
+      name,
+      habits: {
+        phase1: parseInt(row['1'], 10) || parseInt(row.phase1, 10) || 0,
+        phase2: parseInt(row['2'], 10) || parseInt(row.phase2, 10) || 0,
+        phase3: parseInt(row['3'], 10) || parseInt(row.phase3, 10) || 0,
+      },
+    });
+  });
+
+  return Object.keys(groups).map((key, index) => ({
+    id: index + 1,
+    name: key,
+    members: groups[key],
+  }));
+};
+
 // ----- MAIN COMPONENT --------------------------------------------------------
 
 export default function HabitTracker() {
@@ -280,77 +313,34 @@ export default function HabitTracker() {
 
   const phaseKey = `phase${currentPhase}`;
 
-  // --- Data init ---
-    useEffect(() => {
-      async function loadData() {
-        try {
-          const res = await fetch(SHEET_API_URL);
-          const data = await res.json();
-    
-          // Transformē Google Sheet datus tavā teams struktūrā
-          const teams = transformSheetRows(data.rows);
-          setTeams(teams);
-        } catch (err) {
-          console.error("Failed to load sheet data", err);
-        }
-      }
-    
-      loadData();
-    }, []);
-  // konvertē datus no gsheet
-      function transformSheetRows(rows) {
-      const groups = {};
-    
-      rows.forEach(row => {
-        const squad = row.Squad;
-        if (!groups[squad]) groups[squad] = [];
-    
-        groups[squad].push({
-          id: `${squad}-${row.Name}`,
-          name: row.Name,
-          habits: {
-            phase1: parseInt(row["1"]) || 0,
-            phase2: parseInt(row["2"]) || 0,
-            phase3: parseInt(row["3"]) || 0,
-          }
-        });
-      });
-    
-      return Object.keys(groups).map((key, index) => ({
-        id: index + 1,
-        name: key,
-        members: groups[key]
-      }));
-    }
-
-
-      // 2) ja nav datu no API – uzliek sākotnējās komandas
-      setTeams(buildInitialTeams());
-    }
-
-    loadTeams();
-  }, []);
-
-
-  // Save to API (kopīgs visiem)
+  // --- Data init: mēģina ielasīt no Google Sheets, ja neizdodas -> fallback uz INITIAL_TEAMS ---
   useEffect(() => {
-    if (!teams.length) return;
-
-    async function saveTeams() {
+    async function loadData() {
       try {
-        await fetch('/api/teams', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ teams }),
-        });
-      } catch (e) {
-        console.error('Failed to save teams to API:', e);
+        const res = await fetch(SHEET_API_URL);
+        if (!res.ok) {
+          throw new Error('Bad response from sheet API');
+        }
+
+        const data = await res.json(); // { rows: [...] }
+        const rows = data.rows || [];
+
+        if (!rows.length) {
+          console.warn('No rows from sheet, using INITIAL_TEAMS');
+          setTeams(buildInitialTeams());
+          return;
+        }
+
+        const mappedTeams = transformSheetRows(rows);
+        setTeams(mappedTeams);
+      } catch (err) {
+        console.error('Failed to load sheet data, using INITIAL_TEAMS instead:', err);
+        setTeams(buildInitialTeams());
       }
     }
 
-    saveTeams();
-  }, [teams]);
-
+    loadData();
+  }, []);
 
   // --- Admin handling ---
   const handleAdminSubmit = (e) => {
@@ -723,18 +713,11 @@ export default function HabitTracker() {
                   </h2>
                   <div className="grid md:grid-cols-3 gap-4">
                     {ranked.map((team, index) => (
-                      <div
-                        key={team.id}
-                        className="p-4 border border-slate-200 bg-slate-50"
-                      >
+                      <div key={team.id} className="p-4 border border-slate-200 bg-slate-50">
                         <div className="flex items-start justify-between mb-3">
                           <div>
-                            <div className="text-xs text-slate-500 mb-1">
-                              #{index + 1}
-                            </div>
-                            <div className="font-medium text-slate-900">
-                              {team.name}
-                            </div>
+                            <div className="text-xs text-slate-500 mb-1">#{index + 1}</div>
+                            <div className="font-medium text-slate-900">{team.name}</div>
                             <div className="text-xs text-slate-500 mt-1">
                               {team.stats.completed}/{team.stats.total}
                             </div>
@@ -764,16 +747,12 @@ export default function HabitTracker() {
                   key={team.id}
                   onClick={() => setSelectedTeam(isSelected ? null : team.id)}
                   className={`bg-white border p-4 text-left transition ${
-                    isSelected
-                      ? 'border-slate-900'
-                      : 'border-slate-200 hover:border-slate-400'
+                    isSelected ? 'border-slate-900' : 'border-slate-200 hover:border-slate-400'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="font-medium text-slate-900">{team.name}</h3>
-                    <span className="text-xs text-slate-500">
-                      {team.members.length}/9
-                    </span>
+                    <span className="text-xs text-slate-500">{team.members.length}/9</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="flex-1 h-1 bg-slate-100">
@@ -800,9 +779,7 @@ export default function HabitTracker() {
               if (!team) return null;
               return (
                 <>
-                  <h2 className="text-lg font-medium text-slate-900 mb-6">
-                    {team.name}
-                  </h2>
+                  <h2 className="text-lg font-medium text-slate-900 mb-6">{team.name}</h2>
                   <MemberTable
                     team={team}
                     phaseKey={phaseKey}
@@ -821,9 +798,7 @@ export default function HabitTracker() {
             {teams.map((team) => (
               <div key={team.id} className="bg-white border border-slate-200">
                 <div className="px-6 py-4 border-b border-slate-200">
-                  <h3 className="text-base font-medium text-slate-900">
-                    {team.name}
-                  </h3>
+                  <h3 className="text-base font-medium text-slate-900">{team.name}</h3>
                 </div>
                 <div className="p-6">
                   <MemberTable
@@ -893,28 +868,18 @@ export default function HabitTracker() {
                         </span>
                       </td>
                       <td className="py-3 px-4">
-                        <span className="text-slate-900">
-                          {shortenName(member.name)}
-                        </span>
+                        <span className="text-slate-900">{shortenName(member.name)}</span>
                       </td>
                       <td className="py-3 px-4 text-center">
                         <span className="text-xs font-medium text-slate-600">
                           {member.teamName.replace('Squad ', 'S')}
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-center">
-                        {member.phase1}/15
-                      </td>
-                      <td className="py-3 px-4 text-center">
-                        {member.phase2}/15
-                      </td>
-                      <td className="py-3 px-4 text-center">
-                        {member.phase3}/15
-                      </td>
+                      <td className="py-3 px-4 text-center">{member.phase1}/15</td>
+                      <td className="py-3 px-4 text-center">{member.phase2}/15</td>
+                      <td className="py-3 px-4 text-center">{member.phase3}/15</td>
                       <td className="py-3 px-4 text-center bg-slate-50">
-                        <span className="font-semibold text-slate-900">
-                          {member.total}/45
-                        </span>
+                        <span className="font-semibold text-slate-900">{member.total}/45</span>
                       </td>
                     </tr>
                   ))}
@@ -929,9 +894,7 @@ export default function HabitTracker() {
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
             <div className="bg-white rounded-lg shadow-lg w-full max-w-xs p-5 space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium text-slate-900">
-                  Admin access
-                </h3>
+                <h3 className="text-sm font-medium text-slate-900">Admin access</h3>
                 <button
                   type="button"
                   onClick={() => setShowAdminModal(false)}
@@ -941,8 +904,7 @@ export default function HabitTracker() {
                 </button>
               </div>
               <p className="text-xs text-slate-500">
-                Enter admin code to enable editing. Without admin mode, fields
-                are view-only.
+                Enter admin code to enable editing. Without admin mode, fields are view-only.
               </p>
               <form onSubmit={handleAdminSubmit} className="space-y-3">
                 <input
