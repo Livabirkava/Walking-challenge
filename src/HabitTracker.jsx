@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, Users, X } from 'lucide-react';
 
 // ----- CONSTANTS -------------------------------------------------------------
+const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxhceQX2zuvDbYNwVIV-86NhvRwNjEDrpfzez.../exec";
 
 const ADMIN_CODE = 'walkingadmin';
 
@@ -280,22 +281,48 @@ export default function HabitTracker() {
   const phaseKey = `phase${currentPhase}`;
 
   // --- Data init ---
-  useEffect(() => {
-    async function loadTeams() {
-      try {
-        // 1) mēģinām ielādēt no API
-        const res = await fetch('/api/teams');
-        if (res.ok) {
+    useEffect(() => {
+      async function loadData() {
+        try {
+          const res = await fetch(SHEET_API_URL);
           const data = await res.json();
-
-          if (Array.isArray(data.teams) && data.teams.length > 0) {
-            setTeams(data.teams);
-            return; // jau ir dati no servera
-          }
+    
+          // Transformē Google Sheet datus tavā teams struktūrā
+          const teams = transformSheetRows(data.rows);
+          setTeams(teams);
+        } catch (err) {
+          console.error("Failed to load sheet data", err);
         }
-      } catch (e) {
-        console.error('Failed to load from API, using defaults:', e);
       }
+    
+      loadData();
+    }, []);
+  // konvertē datus no gsheet
+      function transformSheetRows(rows) {
+      const groups = {};
+    
+      rows.forEach(row => {
+        const squad = row.Squad;
+        if (!groups[squad]) groups[squad] = [];
+    
+        groups[squad].push({
+          id: `${squad}-${row.Name}`,
+          name: row.Name,
+          habits: {
+            phase1: parseInt(row["1"]) || 0,
+            phase2: parseInt(row["2"]) || 0,
+            phase3: parseInt(row["3"]) || 0,
+          }
+        });
+      });
+    
+      return Object.keys(groups).map((key, index) => ({
+        id: index + 1,
+        name: key,
+        members: groups[key]
+      }));
+    }
+
 
       // 2) ja nav datu no API – uzliek sākotnējās komandas
       setTeams(buildInitialTeams());
