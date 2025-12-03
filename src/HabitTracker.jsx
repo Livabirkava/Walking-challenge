@@ -3,13 +3,12 @@ import { Calendar, Users, X } from 'lucide-react';
 
 // ----- CONSTANTS -------------------------------------------------------------
 
-// 👇 ŠEIT IELIEC SAVU PILNO /exec URL (bez "...")
 const SHEET_API_URL =
   'https://script.google.com/macros/s/AKfycbysVXadEnycsjH6WWwBwrGSVKiskfbslvi4Kc-TWjTWeH93aktcI0TkYG6Zswx-5Jdu/exec';
 
 const ADMIN_CODE = 'walkingadmin';
 
-// Raw team data (names only) – fallback, ja API nestrādā
+// Raw team data (fallback, ja sheets nestrādā)
 const INITIAL_TEAMS = [
   {
     id: 1,
@@ -168,6 +167,43 @@ const calculateStats = (team, phaseKey) => {
   };
 };
 
+// Konvertē Google Sheet rindas uz mūsu `teams` struktūru
+// Sagaidām, ka pirmajā rindā sheetā ir headeri: Squad | Name | 1 | 2 | 3
+const transformSheetRows = (rows) => {
+  if (!Array.isArray(rows)) return buildInitialTeams();
+
+  const groups = {};
+
+  rows.forEach((row) => {
+    // headeri tieši tādi paši, kā sheetā
+    const squad = row['Squad'] || row['squad'];
+    const name = row['Name'] || row['name'];
+
+    if (!squad || !name) return; // ignorē tukšās rindas
+
+    if (!groups[squad]) groups[squad] = [];
+
+    groups[squad].push({
+      id: `${squad}-${name}`,
+      name,
+      habits: {
+        phase1: Number(row['1']) || 0,
+        phase2: Number(row['2']) || 0,
+        phase3: Number(row['3']) || 0,
+      },
+    });
+  });
+
+  const squadNames = Object.keys(groups);
+  if (!squadNames.length) return buildInitialTeams();
+
+  return squadNames.map((squadName, index) => ({
+    id: index + 1,
+    name: squadName,
+    members: groups[squadName],
+  }));
+};
+
 // Reusable member table
 const MemberTable = ({ team, phaseKey, isAdmin, onChange }) => {
   if (!team || !team.members.length) {
@@ -212,9 +248,7 @@ const MemberTable = ({ team, phaseKey, isAdmin, onChange }) => {
                       max="15"
                       value={result}
                       disabled={!isAdmin}
-                      onChange={(e) =>
-                        onChange(team.id, member.id, parseInt(e.target.value, 10))
-                      }
+                      onChange={(e) => onChange(team.id, member.id, parseInt(e.target.value, 10))}
                       className={`w-16 text-center bg-transparent outline-none border-0 text-slate-900 text-sm ${
                         isAdmin ? 'focus:ring-0' : 'cursor-not-allowed text-slate-400'
                       }`}
@@ -265,39 +299,6 @@ const WeekdayHeaderRow = () => (
   </>
 );
 
-// Transformē Google Sheets rindas uz teams struktūru
-// Piezīme: PĀRLIECINIES, ka šeit lietotie key nosaukumi atbilst pirmajai rindai tavā sheet:
-// piem. "Squad", "Name", "1", "2", "3" u.c.
-const transformSheetRows = (rows) => {
-  const groups = {};
-
-  rows.forEach((row, index) => {
-    const squad =
-      row.Squad || row.squad || row.squad_name || row['Squad name'] || row['squad_id'];
-    const name = row.Name || row.name || row.member_name;
-
-    if (!squad || !name) return;
-
-    if (!groups[squad]) groups[squad] = [];
-
-    groups[squad].push({
-      id: `${squad}-${index}`,
-      name,
-      habits: {
-        phase1: parseInt(row['1'], 10) || parseInt(row.phase1, 10) || 0,
-        phase2: parseInt(row['2'], 10) || parseInt(row.phase2, 10) || 0,
-        phase3: parseInt(row['3'], 10) || parseInt(row.phase3, 10) || 0,
-      },
-    });
-  });
-
-  return Object.keys(groups).map((key, index) => ({
-    id: index + 1,
-    name: key,
-    members: groups[key],
-  }));
-};
-
 // ----- MAIN COMPONENT --------------------------------------------------------
 
 export default function HabitTracker() {
@@ -313,34 +314,25 @@ export default function HabitTracker() {
 
   const phaseKey = `phase${currentPhase}`;
 
-  // --- Data init: mēģina ielasīt no Google Sheets, ja neizdodas -> fallback uz INITIAL_TEAMS ---
+  // --- Data init: lasām no Google Sheet, ja nesanāk – fallback uz INITIAL_TEAMS
   useEffect(() => {
-    async function loadData() {
+    async function loadTeams() {
       try {
         const res = await fetch(SHEET_API_URL);
-        if (!res.ok) {
-          throw new Error('Bad response from sheet API');
-        }
+        const data = await res.json();
 
-        const data = await res.json(); // { rows: [...] }
-        const rows = data.rows || [];
-
-        if (!rows.length) {
-          console.warn('No rows from sheet, using INITIAL_TEAMS');
-          setTeams(buildInitialTeams());
-          return;
-        }
-
-        const mappedTeams = transformSheetRows(rows);
-        setTeams(mappedTeams);
+        const fromSheet = transformSheetRows(data.rows);
+        setTeams(fromSheet);
       } catch (err) {
-        console.error('Failed to load sheet data, using INITIAL_TEAMS instead:', err);
+        console.error('Failed to load sheet data, using defaults', err);
         setTeams(buildInitialTeams());
       }
     }
 
-    loadData();
+    loadTeams();
   }, []);
+
+  // Šobrīd mēs tikai LASĀM no sheet – saglabāšana atpakaļ uz sheet vēl nav uztaisīta
 
   // --- Admin handling ---
   const handleAdminSubmit = (e) => {
