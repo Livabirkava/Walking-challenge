@@ -167,17 +167,15 @@ const calculateStats = (team, phaseKey) => {
   };
 };
 
-// Konvertē Google Sheet rindas uz mūsu `teams` struktūru
-// Sagaidām, ka pirmajā rindā sheetā ir headeri: Squad | Name | 1 | 2 | 3
+//Konvertē Google Sheet Squad | Name | 1 | 2 | 3
 const transformSheetRows = (rows) => {
   if (!Array.isArray(rows)) return buildInitialTeams();
 
   const groups = {};
 
   rows.forEach((row) => {
-    // headeri tieši tādi paši, kā sheetā
     const squad = row['Squad'] || row['squad'];
-    const name = row['Name'] || row['name'];
+    const name = row['name'] || row['Name'];
 
     if (!squad || !name) return; // ignorē tukšās rindas
 
@@ -187,9 +185,9 @@ const transformSheetRows = (rows) => {
       id: `${squad}-${name}`,
       name,
       habits: {
-        phase1: Number(row['1']) || 0,
-        phase2: Number(row['2']) || 0,
-        phase3: Number(row['3']) || 0,
+        phase1: Number(row['phase 1']) || 0,
+        phase2: Number(row['phase 2']) || 0,
+        phase3: Number(row['phase 3']) || 0,
       },
     });
   });
@@ -204,7 +202,8 @@ const transformSheetRows = (rows) => {
   }));
 };
 
-// Reusable member table
+
+//Reusable member table
 const MemberTable = ({ team, phaseKey, isAdmin, onChange }) => {
   if (!team || !team.members.length) {
     return (
