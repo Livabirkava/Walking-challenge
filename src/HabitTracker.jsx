@@ -174,10 +174,22 @@ const transformSheetRows = (rows) => {
   const groups = {};
 
   rows.forEach((row) => {
-    const squad = row['Squad'] || row['squad'];
-    const name = row['name'] || row['Name'];
+    // Squad kolonna – tur var būt "Squad", "Squad ", "squad", "squad "
+    const rawSquad =
+      row['Squad'] ??
+      row['Squad '] ??
+      row['squad'] ??
+      row['squad '];
+
+    const squad = rawSquad ? String(rawSquad).trim() : '';
+    const name = (row['Name'] ?? row['name'] ?? '').toString().trim();
 
     if (!squad || !name) return; // ignorē tukšās rindas
+
+    // Fāžu kolonnas – atbalstām gan "1"/"2"/"3", gan "phase 1" utt.
+    const phase1 = Number(row['1'] ?? row['phase 1'] ?? row['Phase 1'] ?? 0) || 0;
+    const phase2 = Number(row['2'] ?? row['phase 2'] ?? row['Phase 2'] ?? 0) || 0;
+    const phase3 = Number(row['3'] ?? row['phase 3'] ?? row['Phase 3'] ?? 0) || 0;
 
     if (!groups[squad]) groups[squad] = [];
 
@@ -185,9 +197,9 @@ const transformSheetRows = (rows) => {
       id: `${squad}-${name}`,
       name,
       habits: {
-        phase1: Number(row['phase 1']) || 0,
-        phase2: Number(row['phase 2']) || 0,
-        phase3: Number(row['phase 3']) || 0,
+        phase1,
+        phase2,
+        phase3,
       },
     });
   });
