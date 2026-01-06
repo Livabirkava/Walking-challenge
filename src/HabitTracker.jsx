@@ -282,17 +282,17 @@ const MemberTable = ({ team, phaseKey, isAdmin, onChange }) => {
   );
 };
 
-// Helper for colored calendar days
+// Helper for colored calendar days (green version)
 const phaseDayClass = (variant) => {
   switch (variant) {
     case 'start':
-      return 'py-1 bg-rose-200 text-rose-900 font-medium';
+      return 'py-1 bg-rose-200 text-rose-900 font-medium'; // keep start as-is
     case 'p1':
-      return 'py-1 bg-sky-200 text-sky-900 font-medium';
+      return 'py-1 bg-emerald-200 text-emerald-900 font-medium';
     case 'p2':
-      return 'py-1 bg-sky-400 text-white font-medium';
+      return 'py-1 bg-emerald-400 text-white font-medium';
     case 'p3':
-      return 'py-1 bg-indigo-400 text-white font-medium';
+      return 'py-1 bg-green-600 text-white font-medium';
     case 'muted':
       return 'text-slate-300';
     default:
