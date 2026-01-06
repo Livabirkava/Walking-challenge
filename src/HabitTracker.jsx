@@ -286,13 +286,13 @@ const MemberTable = ({ team, phaseKey, isAdmin, onChange }) => {
 const phaseDayClass = (variant) => {
   switch (variant) {
     case 'start':
-      return 'py-1 bg-rose-200 text-rose-900 font-medium'; // keep start as-is
+      return 'py-1 bg-rose-200 text-rose-900 font-bold'; // keep start as-is
     case 'p1':
-      return 'py-1 bg-emerald-200 text-emerald-900 font-medium';
+      return 'py-1 bg-sky-200 text-emerald-900 font-bold';
     case 'p2':
-      return 'py-1 bg-emerald-400 text-white font-medium';
+      return 'py-1 bg-sky-400 text-white font-bold';
     case 'p3':
-      return 'py-1 bg-green-600 text-white font-medium';
+      return 'py-1 bg-indigo-600 text-white font-bold';
     case 'muted':
       return 'text-slate-300';
     default:
@@ -487,7 +487,7 @@ export default function HabitTracker() {
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <h3 className="text-lg font-semibold text-rose-500">November</h3>
-                <span className="px-2 py-1 rounded text-xs font-medium bg-sky-200 text-sky-900">
+                <span className="px-2 py-1 rounded text-xs font-bold bg-sky-200 text-red-900">
                   Phase 2
                 </span>
               </div>
@@ -897,7 +897,7 @@ export default function HabitTracker() {
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
             <div className="bg-white rounded-lg shadow-lg w-full max-w-xs p-5 space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium text-slate-900">Admin access</h3>
+                <h3 className="text-sm font-light text-slate-900">Admin access</h3>
                 <button
                   type="button"
                   onClick={() => setShowAdminModal(false)}
