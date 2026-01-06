@@ -286,13 +286,13 @@ const MemberTable = ({ team, phaseKey, isAdmin, onChange }) => {
 const phaseDayClass = (variant) => {
   switch (variant) {
     case 'start':
-      return 'py-1 rounded bg-rose-200 text-rose-900 font-medium';
+      return 'py-1 bg-rose-200 text-rose-900 font-medium';
     case 'p1':
-      return 'py-1 rounded bg-sky-200 text-sky-900 font-medium';
+      return 'py-1 bg-sky-200 text-sky-900 font-medium';
     case 'p2':
-      return 'py-1 rounded bg-sky-400 text-white font-medium';
+      return 'py-1 bg-sky-400 text-white font-medium';
     case 'p3':
-      return 'py-1 rounded bg-indigo-400 text-white font-medium';
+      return 'py-1 bg-indigo-400 text-white font-medium';
     case 'muted':
       return 'text-slate-300';
     default:
